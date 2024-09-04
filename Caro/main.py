@@ -104,65 +104,62 @@ def display_board():
                     screen.blit(o_img, ((width + margin) * column + 2, (height + margin) * row + 2))
                     
 def reset():
-    for i in range(0, rownum):
-        for j in range(0, colnum):
+    global XO, status, game_over
+    for i in range(rownum):
+        for j in range(colnum):
             grid[i][j] = 0
-    XO = x
-    
-                    
+    XO = 'x'
+    status = 0
+    game_over = False
 
-#loop until the user clicks the close button
+# loop until the user clicks the close button
 done = False
-status = None
+status = 0
 game_over = False
 
 while not done:
-    # User do some operations
     for event in pygame.event.get():
-        
-        display_board()
-        
         if event.type == pygame.QUIT:
             done = True
-            
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        
+        if event.type == pygame.MOUSEBUTTONDOWN and not game_over:
             pos = pygame.mouse.get_pos()
             col = pos[0] // (width + margin)
             row = pos[1] // (height + margin)
             
-            if grid[row][col] == 0:
-                if XO == 'x':
-                    grid[row][col] = XO
-                    XO = 'o'
-                else:
-                    grid[row][col] = XO
-                    XO = 'x'
-                    
-        status = checkwin(grid)
-            
-        if status == 3:
-            font = pygame.font.Font('FreeSansBold.ttf', 100)
-            text = font.render('Draw', True, GREEN, BLUE)
-            textRect = text.get_rect()
-            textRect.center = window_size[0] / 2, window_size[1] / 2
-            screen.blit(text, textRect)
-            
-        if status == 1:
-            screen.blit(player1win_img, ((1920 - 500) / 2, (990 - 500) / 2 - 100))
-            
-        if status == 2:
-            screen.blit(player2win_img, ((1920 - 500) / 2, (990 - 500) / 2 - 100))      
-                
-        if status != 0:
-            screen.blit(restart_btn, ((1920 - 300) / 2, 700))
+            if 0 <= row < rownum and 0 <= col < colnum and grid[row][col] == 0:
+                grid[row][col] = XO
+                XO = 'o' if XO == 'x' else 'x'
+                status = checkwin(grid)
+                if status != 0:
+                    game_over = True
 
-        if event.type == pygame.MOUSEBUTTONDOWN and status != 0:
-            y, x = pygame.mouse.get_pos()
-            print(x, y, sep = " ")
-            if x >= 700 and x < 700 + 200 and y >= 810 and y < 810 + 300:
+        if event.type == pygame.MOUSEBUTTONDOWN and game_over:
+            x, y = pygame.mouse.get_pos()
+            restart_rect = pygame.Rect((1920 - 300) // 2, 700, 300, 200)
+            if restart_rect.collidepoint(x, y):
                 reset()
-                # done = True
+
+    screen.fill(BLACK)
+    display_board()
+
+    if status == 3:
+        font = pygame.font.Font('FreeSansBold.ttf', 100)
+        text = font.render('Draw', True, GREEN, BLUE)
+        textRect = text.get_rect()
+        textRect.center = window_size[0] // 2, window_size[1] // 2
+        screen.blit(text, textRect)
     
-                
-    clock.tick(FPS)
+    if status == 1:
+        screen.blit(player1win_img, ((1920 - 500) // 2, (990 - 500) // 2 - 100))
+    
+    if status == 2:
+        screen.blit(player2win_img, ((1920 - 500) // 2, (990 - 500) // 2 - 100))
+
+    if game_over:
+        screen.blit(restart_btn, ((1920 - 300) // 2, 700))
+
     pygame.display.update()
+    clock.tick(FPS)
+
+pygame.quit()
