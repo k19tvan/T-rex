@@ -39,6 +39,7 @@ x_img = pygame.transform.smoothscale(pygame.image.load("icon_X.png").convert(), 
 o_img = pygame.transform.smoothscale(pygame.image.load("icon_O.png").convert(), (28, 28))
 player1win_img = pygame.transform.smoothscale(pygame.image.load("player1win.png").convert(), (500, 500))
 player2win_img = pygame.transform.smoothscale(pygame.image.load("player2win.png").convert(), (500, 500))
+restart_btn = pygame.transform.smoothscale(pygame.image.load("Restart.jpeg").convert(), (300, 200))
 
 clock = pygame.time.Clock()
 
@@ -101,10 +102,19 @@ def display_board():
                     screen.blit(x_img, ((width + margin) * column + 2, (height + margin) * row + 2))
                 if grid[row][column] == 'o':
                     screen.blit(o_img, ((width + margin) * column + 2, (height + margin) * row + 2))
+                    
+def reset():
+    for i in range(0, rownum):
+        for j in range(0, colnum):
+            grid[i][j] = 0
+    XO = x
+    
+                    
 
 #loop until the user clicks the close button
 done = False
 status = None
+game_over = False
 
 while not done:
     # User do some operations
@@ -128,50 +138,31 @@ while not done:
                     grid[row][col] = XO
                     XO = 'x'
                     
-            display_board()
-                    
-            status = checkwin(grid)
+        status = checkwin(grid)
             
-            if status == 3:
-                font = pygame.font.Font('FreeSansBold.ttf', 100)
-                text = font.render('Draw', True, GREEN, BLUE)
-                textRect = text.get_rect()
-                textRect.center = window_size[0] / 2, window_size[1] / 2
-                screen.blit(text, textRect)
-                done = True
+        if status == 3:
+            font = pygame.font.Font('FreeSansBold.ttf', 100)
+            text = font.render('Draw', True, GREEN, BLUE)
+            textRect = text.get_rect()
+            textRect.center = window_size[0] / 2, window_size[1] / 2
+            screen.blit(text, textRect)
+            
+        if status == 1:
+            screen.blit(player1win_img, ((1920 - 500) / 2, (990 - 500) / 2 - 100))
+            
+        if status == 2:
+            screen.blit(player2win_img, ((1920 - 500) / 2, (990 - 500) / 2 - 100))      
                 
-            if status == 1:
-                screen.blit(player1win_img, ((1920 - 500) / 2, (990 - 500) / 2, 500, 500))
-                done = True
-                
-            if status == 2:
-                screen.blit(player2win_img, ((1920 - 500) / 2, (990 - 500) / 2, 500, 500))
-                done = True                
-                
-    # if done == True:
-    #     pygame.time.delay(100000000)
-    #     font = pygame.font.Font('FreeSansBold.ttf', 100)
-    #     text = font.render('New match', True, BLACK, WHITE)
-    #     text.border
-    #     text_rect = text.get_rect()
-    #     text_rect.center = (window_size[0] / 2, window_size[1] / 2 + 400)
-    #     screen.blit(text, text_rect)
+        if status != 0:
+            screen.blit(restart_btn, ((1920 - 300) / 2, 700))
+
+        if event.type == pygame.MOUSEBUTTONDOWN and status != 0:
+            y, x = pygame.mouse.get_pos()
+            print(x, y, sep = " ")
+            if x >= 700 and x < 700 + 200 and y >= 810 and y < 810 + 300:
+                reset()
+                # done = True
     
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.MOUSEBUTTONDOWN:
-    #             y, x = pygame.mouse.get_pos()
-    #             if x >= window_size[0] / 2 and x <= window_size[0] / 2 + text.get_width() and y >= window_size[1] / 2 + 400 and y <= window_size[1] / 2 + 400 + text.get_height():
-    #                 done = False
-    #                 for rows in grid:
-    #                     for cells in rows:
-    #                         cells = 0
-            
                 
-        
     clock.tick(FPS)
     pygame.display.update()
-    
-pygame.time.delay(10000)
-quit()
-pygame.quit()
-sys.exit()
