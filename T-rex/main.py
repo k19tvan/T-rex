@@ -25,16 +25,17 @@ trex_v = 0
 gravity = 1
 jump_strength = -15
 is_jumping = False
+trex_image = pygame.transform.scale(pygame.image.load('dinosaur.png'), (trex_width, trex_height))
 
 # thorn
 thorn_width, thorn_height = 20, 40
 thorn_x = width
 thorn_y = height - thorn_height - 10
 thorn_v = 5
+thorn_image = pygame.transform.scale(pygame.image.load('pipe.png'), (thorn_width, thorn_height))
 
 # score
 score = 0
-font = pygame.font.Font(None, 36)
 
 # loop
 running = True
@@ -66,9 +67,9 @@ while running:
         running = False
 
     screen.fill(WHITE)  
-    pygame.draw.rect(screen, BLACK, (trex_x, trex_y, trex_width, trex_height))
-    pygame.draw.rect(screen, GREEN, (thorn_x, thorn_y, thorn_width, thorn_height))
-    
+    # pygame.draw.rect(screen, BLACK, (trex_x, trex_y, trex_width, trex_height))
+    screen.blit(trex_image, (trex_x, trex_y))
+    screen.blit(thorn_image, (thorn_x, thorn_y))    
     pygame.display.flip()
     
 
